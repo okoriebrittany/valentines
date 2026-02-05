@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be My Valentine?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Dancing+Script:wght@700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .font-dancing { font-family: 'Dancing Script', cursive; }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }
+      50% { box-shadow: 0 0 40px rgba(244, 63, 94, 0.8); }
+    }
+    
+    @keyframes heart-beat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.15); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes confetti-fall {
+      0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    
+    .floating-heart {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .yes-btn {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    .heart-beat {
+      animation: heart-beat 1s ease-in-out infinite;
+    }
+    
+    .sparkle {
+      animation: sparkle 1.5s ease-in-out infinite;
+    }
+    
+    .slide-up {
+      animation: slide-up 0.8s ease-out forwards;
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      animation: confetti-fall 3s linear forwards;
+    }
+    
+    .no-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .slide-container {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+    
+    .slide-container.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app-wrapper" class="w-full h-full overflow-auto"><!-- Question Screen -->
+   <div id="question-screen" class="w-full min-h-full flex flex-col items-center justify-center p-8 relative overflow-hidden" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"><!-- Floating Hearts Background -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+     <div class="floating-heart absolute top-10 left-10 text-5xl" style="animation-delay: 0s;">
+      💕
+     </div>
+     <div class="floating-heart absolute top-20 right-20 text-4xl" style="animation-delay: 0.5s;">
+      💖
+     </div>
+     <div class="floating-heart absolute bottom-32 left-20 text-6xl" style="animation-delay: 1s;">
+      💗
+     </div>
+     <div class="floating-heart absolute top-40 left-1/4 text-3xl" style="animation-delay: 1.5s;">
+      💝
+     </div>
+     <div class="floating-heart absolute bottom-20 right-10 text-5xl" style="animation-delay: 2s;">
+      💘
+     </div>
+     <div class="floating-heart absolute top-1/3 right-1/4 text-4xl" style="animation-delay: 0.8s;">
+      ❤️
+     </div>
+    </div><!-- Sparkles -->
+    <div class="sparkle absolute top-1/4 left-1/3 text-2xl" style="animation-delay: 0s;">
+     ✨
+    </div>
+    <div class="sparkle absolute top-1/3 right-1/3 text-xl" style="animation-delay: 0.5s;">
+     ⭐
+    </div>
+    <div class="sparkle absolute bottom-1/4 left-1/4 text-2xl" style="animation-delay: 1s;">
+     ✨
+    </div><!-- Main Content -->
+    <div class="relative z-10 text-center max-w-2xl mx-auto"><!-- Big Heart -->
+     <div class="heart-beat text-8xl mb-6">
+      💖
+     </div><!-- From Label -->
+     <p id="from-label" class="font-dancing text-2xl mb-4" style="color: #f9a8d4;">From your loving wife</p><!-- Main Question -->
+     <h1 id="main-question" class="font-playfair text-4xl md:text-6xl font-bold mb-4 leading-tight" style="color: #fdf2f8;">My Dearest Husband...</h1>
+     <p id="question-text" class="font-dancing text-3xl md:text-5xl mb-12" style="color: #f472b6;">Will you be my Valentine?</p><!-- Buttons -->
+     <div class="flex flex-col sm:flex-row gap-6 justify-center items-center"><button id="yes-btn" onclick="showSlideshow()" class="yes-btn font-playfair text-xl font-semibold px-12 py-4 rounded-full transform hover:scale-110 transition-transform duration-300" style="background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); color: white;"> Yes, Forever! 💕 </button> <button id="no-btn" onmouseover="moveNoButton()" class="no-btn font-playfair text-lg px-8 py-3 rounded-full border-2 transition-all duration-300" style="background: transparent; color: #f9a8d4; border-color: #f9a8d4;"> No... </button>
+     </div>
+     <p id="no-hint" class="mt-6 text-sm opacity-0 transition-opacity duration-500" style="color: #f9a8d4;">(That button seems to be running away... 😉)</p>
+    </div>
+   </div><!-- Slideshow Screen -->
+   <div id="slideshow-screen" class="w-full min-h-full hidden flex-col items-center justify-center p-8 relative overflow-hidden" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"><!-- Confetti Container -->
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50"></div><!-- Slide Content -->
+    <div id="slide-content" class="relative z-10 text-center max-w-3xl mx-auto"><!-- Slides will be injected here -->
+    </div><!-- Navigation -->
+    <div class="relative z-10 mt-12 flex items-center gap-8"><button id="prev-btn" onclick="prevSlide()" class="font-playfair px-6 py-3 rounded-full transition-all duration-300 hover:scale-110" style="background: rgba(244, 63, 94, 0.3); color: #fdf2f8; border: 2px solid #f43f5e;"> ← Back </button>
+     <div id="slide-dots" class="flex gap-2"><!-- Dots will be injected here -->
+     </div><button id="next-btn" onclick="nextSlide()" class="font-playfair px-6 py-3 rounded-full transition-all duration-300 hover:scale-110" style="background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); color: white;"> Next → </button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      wife_name: "Your Wife",
+      husband_name: "My Love",
+      main_question: "Will you be my Valentine?"
+    };
+    
+    let config = { ...defaultConfig };
+    let currentSlide = 0;
+    let noButtonAttempts = 0;
+    
+    const slides = [
+      {
+        emoji: "🎉",
+        title: "YES! You said YES!",
+        content: "I knew you couldn't resist! You've just made me the happiest wife in the entire universe!"
+      },
+      {
+        emoji: "💪",
+        title: "You're Incredibly Strong",
+        content: "Not just physically, but emotionally too. You carry our family with such grace and dedication."
+      },
+      {
+        emoji: "😍",
+        title: "Those Eyes Though...",
+        content: "Every time you look at me, my heart still skips a beat. After all this time, you still give me butterflies!"
+      },
+      {
+        emoji: "🧠",
+        title: "Brilliantly Smart",
+        content: "Your intelligence amazes me every day. The way you solve problems and think things through... absolutely attractive!"
+      },
+      {
+        emoji: "😂",
+        title: "You Make Me Laugh",
+        content: "Your sense of humor is everything! Even on the hardest days, you know how to make me smile."
+      },
+      {
+        emoji: "🏠",
+        title: "Our Safe Haven",
+        content: "You've built us a life full of love, warmth, and security. Home is wherever you are."
+      },
+      {
+        emoji: "🔥",
+        title: "Still Hot After All This Time",
+        content: "Let's be honest... you're still the most handsome person I've ever laid eyes on. Lucky me! 🥵"
+      },
+      {
+        emoji: "💖",
+        title: "Forever & Always",
+        content: "I choose you today, tomorrow, and every day after. Happy Valentine's Day, my forever Valentine!"
+      }
+    ];
+    
+    function moveNoButton() {
+      const noBtn = document.getElementById('no-btn');
+      const hint = document.getElementById('no-hint');
+      noButtonAttempts++;
+      
+      hint.style.opacity = '1';
+      
+      const maxX = window.innerWidth - noBtn.offsetWidth - 100;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 100;
+      
+      const randomX = Math.random() * maxX;
+      const randomY = Math.random() * maxY;
+      
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+      noBtn.style.zIndex = '100';
+      
+      if (noButtonAttempts > 3) {
+        noBtn.textContent = "Can't catch me! 😜";
+      }
+      if (noButtonAttempts > 6) {
+        noBtn.textContent = "Just say YES! 💕";
+      }
+      if (noButtonAttempts > 10) {
+        noBtn.style.display = 'none';
+      }
+    }
+    
+    function createConfetti() {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#f43f5e', '#ec4899', '#f9a8d4', '#fdf2f8', '#fbbf24', '#a78bfa'];
+      
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          container.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 4000);
+        }, i * 50);
+      }
+    }
+    
+    function showSlideshow() {
+      document.getElementById('question-screen').classList.add('hidden');
+      document.getElementById('slideshow-screen').classList.remove('hidden');
+      document.getElementById('slideshow-screen').classList.add('flex');
+      
+      createConfetti();
+      renderSlide();
+      renderDots();
+    }
+    
+    function renderSlide() {
+      const container = document.getElementById('slide-content');
+      const slide = slides[currentSlide];
+      const husbandName = config.husband_name || defaultConfig.husband_name;
+      
+      let content = slide.content;
+      if (currentSlide === 0) {
+        content = `I knew you couldn't resist, ${husbandName}! You've just made me the happiest wife in the entire universe!`;
+      }
+      if (currentSlide === slides.length - 1) {
+        content = `I choose you today, tomorrow, and every day after. Happy Valentine's Day, ${husbandName}, my forever Valentine!`;
+      }
+      
+      container.innerHTML = `
+        <div class="slide-container" id="current-slide">
+          <div class="text-8xl mb-8 heart-beat">${slide.emoji}</div>
+          <h2 class="font-playfair text-4xl md:text-5xl font-bold mb-6" style="color: #fdf2f8;">
+            ${slide.title}
+          </h2>
+          <p class="font-dancing text-2xl md:text-3xl leading-relaxed" style="color: #f9a8d4;">
+            ${content}
+          </p>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        document.getElementById('current-slide').classList.add('active');
+      }, 50);
+      
+      updateNavigation();
+    }
+    
+    function renderDots() {
+      const dotsContainer = document.getElementById('slide-dots');
+      dotsContainer.innerHTML = slides.map((_, index) => `
+        <button onclick="goToSlide(${index})" 
+                class="w-3 h-3 rounded-full transition-all duration-300"
+                style="background: ${index === currentSlide ? '#f43f5e' : 'rgba(244, 63, 94, 0.3)'};">
+        </button>
+      `).join('');
+    }
+    
+    function updateNavigation() {
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      
+      prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+      prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+      
+      if (currentSlide === slides.length - 1) {
+        nextBtn.innerHTML = '💕 Restart';
+        nextBtn.onclick = () => { currentSlide = 0; renderSlide(); renderDots(); createConfetti(); };
+      } else {
+        nextBtn.innerHTML = 'Next →';
+        nextBtn.onclick = nextSlide;
+      }
+    }
+    
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        renderSlide();
+        renderDots();
+      }
+    }
+    
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+        renderDots();
+      }
+    }
+    
+    function goToSlide(index) {
+      currentSlide = index;
+      renderSlide();
+      renderDots();
+    }
+    
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      const wifeName = config.wife_name || defaultConfig.wife_name;
+      const mainQuestion = config.main_question || defaultConfig.main_question;
+      
+      document.getElementById('from-label').textContent = `From ${wifeName}`;
+      document.getElementById('question-text').textContent = mainQuestion;
+      
+      if (!document.getElementById('slideshow-screen').classList.contains('hidden')) {
+        renderSlide();
+      }
+    }
+    
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+    
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ["wife_name", cfg.wife_name || defaultConfig.wife_name],
+        ["husband_name", cfg.husband_name || defaultConfig.husband_name],
+        ["main_question", cfg.main_question || defaultConfig.main_question]
+      ]);
+    }
+    
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities,
+      mapToEditPanelValues
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c95142e26a46ab6',t:'MTc3MDMyMjUxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
